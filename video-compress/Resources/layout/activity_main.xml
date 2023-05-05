@@ -19,7 +19,40 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/content_main" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/OriginalVideoName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Original Video Name"/>
+        <TextView
+            android:id="@+id/OriginalVideoSize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Original Video Size"/>
+
+        <TextView
+            android:id="@+id/CompressingProgress"
+            android:layout_marginTop="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="0 %"/>
+
+        <TextView
+            android:id="@+id/CompressedVideoName"
+            android:layout_marginTop="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Compressed Video Size"/>
+        <TextView
+            android:id="@+id/CompressedVideoSize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Compressed Video Size"/>
+    </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"

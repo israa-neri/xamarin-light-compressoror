@@ -15,6 +15,8 @@ using Android.Util;
 using Java.IO;
 using Android.Graphics;
 using Android.Provider;
+using Android.Widget;
+using static Android.Hardware.Camera;
 
 namespace video_compress
 {
@@ -25,17 +27,27 @@ namespace video_compress
 
         private String _selectedVideoPath;
 
+        public TextView OriginalName, OriginalSize, CompressedName, CompressedSize, CompressingProgress;
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             SetContentView(Resource.Layout.activity_main);
 
-            Toolbar toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
+            AndroidX.AppCompat.Widget.Toolbar toolbar = FindViewById<AndroidX.AppCompat.Widget.Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(toolbar);
 
             FloatingActionButton fab = FindViewById<FloatingActionButton>(Resource.Id.fab);
             fab.Click += FabOnClick;
+
+            OriginalName = FindViewById<TextView>(Resource.Id.OriginalVideoName);
+            OriginalSize = FindViewById<TextView>(Resource.Id.OriginalVideoSize);
+
+            CompressingProgress = FindViewById<TextView>(Resource.Id.CompressingProgress);
+
+            CompressedName = FindViewById<TextView>(Resource.Id.CompressedVideoName);
+            CompressedSize = FindViewById<TextView>(Resource.Id.CompressedVideoSize);
         }
 
         public override bool OnCreateOptionsMenu(IMenu menu)
@@ -80,17 +92,21 @@ namespace video_compress
                 if (requestCode == _selectVideo)
                 {
                     // _selectedVideoPath = getPath(data.Data);
-                    var vcl = new VideoCompressorListener();
+
+                    OriginalName.Text = data.Data.ToString();
+                    OriginalSize.Text = $"{GetSize(data.Data)}";
+
+                    var vcl = new VideoCompressorListener(this);
 
                     var configuration = new Configuration(
-                        VideoQuality.Medium,
-                        null,
+                        VideoQuality.VeryLow,
+                        Java.Lang.Integer.ValueOf(60),
                         false,
-                        Java.Lang.Integer.ValueOf(1500000), // Bitrate (bit/s)
+                        Java.Lang.Integer.ValueOf(50000), // Bitrate (bit/s)
                         false,
                         false,
-                        Java.Lang.Double.ValueOf(1280),
-                        Java.Lang.Double.ValueOf(720)
+                        Java.Lang.Double.ValueOf(720),
+                        Java.Lang.Double.ValueOf(500)
                       );
 
                     var uris = new List<Android.Net.Uri>
@@ -139,6 +155,12 @@ namespace video_compress
         //    }
         //    else return null;
         //}
+
+        public long GetSize(Android.Net.Uri uri)
+        {
+            using (var fd = ContentResolver.OpenFileDescriptor(uri, "r"))
+            return fd.StatSize;
+        }
     }
 }
 

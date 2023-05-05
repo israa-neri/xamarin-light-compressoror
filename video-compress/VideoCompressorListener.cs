@@ -1,11 +1,15 @@
-﻿using Com.Abedelazizshe.Lightcompressorlibrary;
+﻿using System;
+using Com.Abedelazizshe.Lightcompressorlibrary;
+using Xamarin.Essentials;
 
 namespace video_compress
 {
     public class VideoCompressorListener : Java.Lang.Object, ICompressionListener
     {
-        public VideoCompressorListener()
+        private MainActivity _mainActivity;
+        public VideoCompressorListener(MainActivity mainActivity)
         {
+            _mainActivity = mainActivity;
         }
 
         public void OnCancelled(int index)
@@ -13,7 +17,7 @@ namespace video_compress
             System.Diagnostics.Debug.WriteLine("\n\n");
             System.Diagnostics.Debug.WriteLine("OnCancelled");
             System.Diagnostics.Debug.WriteLine(index);
-
+            _mainActivity.CompressingProgress.Text = $"0 % Compression Cancelled!";
         }
 
         public void OnFailure(int index, string failureMessage)
@@ -22,6 +26,7 @@ namespace video_compress
             System.Diagnostics.Debug.WriteLine("OnFailure");
             System.Diagnostics.Debug.WriteLine(index);
             System.Diagnostics.Debug.WriteLine(failureMessage);
+            _mainActivity.CompressingProgress.Text = $"0 % Compression failed!";
         }
 
         public void OnProgress(int index, float percent)
@@ -30,6 +35,10 @@ namespace video_compress
             System.Diagnostics.Debug.WriteLine("OnProgress");
             System.Diagnostics.Debug.WriteLine(index);
             System.Diagnostics.Debug.WriteLine(percent);
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                _mainActivity.CompressingProgress.Text = $"{percent.ToString()} %";
+            });
         }
 
         public void OnStart(int index)
@@ -37,9 +46,10 @@ namespace video_compress
             System.Diagnostics.Debug.WriteLine("\n\n");
             System.Diagnostics.Debug.WriteLine("OnStart");
             System.Diagnostics.Debug.WriteLine(index);
+            _mainActivity.CompressingProgress.Text = "0 %";
         }
 
-        public async void OnSuccess(int index, long size, string path)
+        public void OnSuccess(int index, long size, string path)
         {
             System.Diagnostics.Debug.WriteLine("\n\n");
             System.Diagnostics.Debug.WriteLine("OnSuccess");
@@ -47,6 +57,10 @@ namespace video_compress
             System.Diagnostics.Debug.WriteLine(size);
             System.Diagnostics.Debug.WriteLine(path);
 
+            _mainActivity.CompressingProgress.Text = "100 %";
+
+            _mainActivity.CompressedName.Text = path;
+            _mainActivity.CompressedSize.Text = size.ToString();
         }
     }
 }
