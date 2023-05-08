@@ -19,6 +19,7 @@ namespace video_compress
             MainActivity mainActivity
             )
 		{
+            _mainActivity = mainActivity;
 			_listener = listener;
 			_uris = uris;
         }

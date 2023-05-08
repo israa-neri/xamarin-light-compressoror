@@ -98,76 +98,16 @@ namespace video_compress
                     OriginalName.Text = data.Data.Path;
                     OriginalSize.Text = $"{GetSize(data.Data)}";
 
-                    var vcl = new VideoCompressorListener(this);
-
-                    //var configuration = new Configuration(
-                    //    VideoQuality.VeryLow,
-                    //    Java.Lang.Integer.ValueOf(60),
-                    //    false,
-                    //    Java.Lang.Integer.ValueOf(50000), // Bitrate (bit/s)
-                    //    false,
-                    //    false,
-                    //    Java.Lang.Double.ValueOf(720),
-                    //    Java.Lang.Double.ValueOf(500)
-                    //  );
-
-                    // Bigger
-                    //var configuration = new Configuration(
-                    //    VideoQuality.VeryHigh,
-                    //    Java.Lang.Integer.ValueOf(24),
-                    //    false,
-                    //    Java.Lang.Integer.ValueOf(50000), //Bitrate (bit/s)
-                    //    false,
-                    //    false,
-                    //    Java.Lang.Double.ValueOf(360),
-                    //    Java.Lang.Double.ValueOf(480)
-                    //  );
-
-                    // Smaller
-                    //var configuration = new Configuration(
-                    //    VideoQuality.VeryLow,
-                    //    Java.Lang.Integer.ValueOf(90),
-                    //    false,
-                    //    Java.Lang.Integer.ValueOf(50000), //Bitrate (bit/s)
-                    //    false,
-                    //    false,
-                    //    Java.Lang.Double.ValueOf(360),
-                    //    Java.Lang.Double.ValueOf(480)
-                    //  );
-
-                    // WORK
-                    //var configuration = new Configuration(
-                    //    VideoQuality.VeryLow,
-                    //    Java.Lang.Integer.ValueOf(120),
-                    //    false,
-                    //    Java.Lang.Integer.ValueOf(1500), //Bitrate (bit/s)
-                    //    false,
-                    //    true,
-                    //    null,
-                    //    null
-                    //  );
-
-                    var configuration = new Configuration(
-                        VideoQuality.VeryLow,
-                        Java.Lang.Integer.ValueOf(120),
-                        false,
-                        Java.Lang.Integer.ValueOf(1500), //Bitrate (bit/s)
-                        false,
-                        true,
-                        null,
-                        null
-                      );
+                    var vcl = new CustomVideoCompressorListener(this);
 
                     var uris = new List<Android.Net.Uri>
                       {
                           data.Data
                       };
 
-                    VideoCompressor.Start(this,
-                                      uris,
-                                      $"{Android.OS.Environment.DirectoryMovies}/compressedVideos",
-                                      vcl,
-                                      configuration);
+                    var cvc = new CustomVideoCompressor(vcl, uris, this);
+
+                    cvc.StartCompression();
                     try
                     {
                         if (_selectedVideoPath == null)
