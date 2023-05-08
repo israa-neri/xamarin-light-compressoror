@@ -1,20 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
 using Com.Abedelazizshe.Lightcompressorlibrary;
-using Java.Lang;
 using Xamarin.Essentials;
 
 namespace video_compress
 {
-    public class VideoCompressorListener : Java.Lang.Object, ICompressionListener
-    {
+	public class CustomVideoCompressorListener : Java.Lang.Object, IVideoCompressorListener, ICompressionListener
+	{
         private MainActivity _mainActivity;
-        public VideoCompressorListener(MainActivity mainActivity)
-        {
+        public CustomVideoCompressorListener(MainActivity mainActivity)
+		{
             _mainActivity = mainActivity;
         }
 
         public void OnCancelled(int index)
+        {
+            OnCompressCancelled(index);
+        }
+
+        public void OnCompressCancelled(int index)
         {
             System.Diagnostics.Debug.WriteLine("\n\n");
             System.Diagnostics.Debug.WriteLine("OnCancelled");
@@ -22,7 +25,7 @@ namespace video_compress
             _mainActivity.CompressingProgress.Text = $"0 % Compression Cancelled!";
         }
 
-        public void OnFailure(int index, string failureMessage)
+        public void OnCompressFailure(int index, string failureMessage)
         {
             System.Diagnostics.Debug.WriteLine("\n\n");
             System.Diagnostics.Debug.WriteLine("OnFailure");
@@ -31,7 +34,7 @@ namespace video_compress
             _mainActivity.CompressingProgress.Text = $"0 % Compression failed!";
         }
 
-        public void OnProgress(int index, float percent)
+        public void OnCompressProgress(int index, float percent)
         {
             System.Diagnostics.Debug.WriteLine("\n\n");
             System.Diagnostics.Debug.WriteLine("OnProgress");
@@ -43,7 +46,7 @@ namespace video_compress
             });
         }
 
-        public void OnStart(int index)
+        public void OnCompressStart(int index)
         {
             System.Diagnostics.Debug.WriteLine("\n\n");
             System.Diagnostics.Debug.WriteLine("OnStart");
@@ -51,7 +54,7 @@ namespace video_compress
             _mainActivity.CompressingProgress.Text = "0 %";
         }
 
-        public void OnSuccess(int index, long size, string path)
+        public void OnCompressSuccess(int index, long size, string path)
         {
             System.Diagnostics.Debug.WriteLine("\n\n");
             System.Diagnostics.Debug.WriteLine("OnSuccess");
@@ -66,19 +69,24 @@ namespace video_compress
             _mainActivity.CompressedSize.Text = $"{(size).ToString()}";
         }
 
-        public string GetFileSize(Long size)
+        public void OnFailure(int index, string failureMessage)
         {
-            if (size.IntValue() <= 0)
-                return "0";
+            OnCompressFailure(index, failureMessage);
+        }
 
-            var units = new List<string> { "B", "KB", "MB", "GB", "TB" };
-            var digitGroups = ((int)(System.Math.Log10(size.DoubleValue()) / System.Math.Log10(1024.0)));
+        public void OnProgress(int index, float percent)
+        {
+            OnCompressProgress(index, percent);
+        }
 
-            return $"{System.Math.Pow(1024.0, (double)digitGroups).ToString("#,##0.#")} {units[digitGroups]}";
+        public void OnStart(int index)
+        {
+            OnCompressStart(index);
+        }
 
-            //DecimalFormat("#,##0.#").format(
-            //    size / .Pow(digitGroups.toDouble())
-            //) + " " + units[digitGroups];
+        public void OnSuccess(int index, long size, string path)
+        {
+            OnCompressSuccess(index, size, path);
         }
     }
 }

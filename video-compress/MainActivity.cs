@@ -17,6 +17,8 @@ using Android.Graphics;
 using Android.Provider;
 using Android.Widget;
 using static Android.Hardware.Camera;
+using Java.Lang;
+using static Android.InputMethodServices.Keyboard;
 
 namespace video_compress
 {
@@ -25,7 +27,7 @@ namespace video_compress
     {
         private int _selectVideo = 1;
 
-        private String _selectedVideoPath;
+        private string _selectedVideoPath;
 
         public TextView OriginalName, OriginalSize, CompressedName, CompressedSize, CompressingProgress;
 
@@ -93,20 +95,67 @@ namespace video_compress
                 {
                     // _selectedVideoPath = getPath(data.Data);
 
-                    OriginalName.Text = data.Data.ToString();
+                    OriginalName.Text = data.Data.Path;
                     OriginalSize.Text = $"{GetSize(data.Data)}";
 
                     var vcl = new VideoCompressorListener(this);
 
+                    //var configuration = new Configuration(
+                    //    VideoQuality.VeryLow,
+                    //    Java.Lang.Integer.ValueOf(60),
+                    //    false,
+                    //    Java.Lang.Integer.ValueOf(50000), // Bitrate (bit/s)
+                    //    false,
+                    //    false,
+                    //    Java.Lang.Double.ValueOf(720),
+                    //    Java.Lang.Double.ValueOf(500)
+                    //  );
+
+                    // Bigger
+                    //var configuration = new Configuration(
+                    //    VideoQuality.VeryHigh,
+                    //    Java.Lang.Integer.ValueOf(24),
+                    //    false,
+                    //    Java.Lang.Integer.ValueOf(50000), //Bitrate (bit/s)
+                    //    false,
+                    //    false,
+                    //    Java.Lang.Double.ValueOf(360),
+                    //    Java.Lang.Double.ValueOf(480)
+                    //  );
+
+                    // Smaller
+                    //var configuration = new Configuration(
+                    //    VideoQuality.VeryLow,
+                    //    Java.Lang.Integer.ValueOf(90),
+                    //    false,
+                    //    Java.Lang.Integer.ValueOf(50000), //Bitrate (bit/s)
+                    //    false,
+                    //    false,
+                    //    Java.Lang.Double.ValueOf(360),
+                    //    Java.Lang.Double.ValueOf(480)
+                    //  );
+
+                    // WORK
+                    //var configuration = new Configuration(
+                    //    VideoQuality.VeryLow,
+                    //    Java.Lang.Integer.ValueOf(120),
+                    //    false,
+                    //    Java.Lang.Integer.ValueOf(1500), //Bitrate (bit/s)
+                    //    false,
+                    //    true,
+                    //    null,
+                    //    null
+                    //  );
+
                     var configuration = new Configuration(
                         VideoQuality.VeryLow,
-                        Java.Lang.Integer.ValueOf(60),
+                        Java.Lang.Integer.ValueOf(120),
                         false,
-                        Java.Lang.Integer.ValueOf(50000), // Bitrate (bit/s)
+                        Java.Lang.Integer.ValueOf(1500), //Bitrate (bit/s)
                         false,
-                        false,
-                        Java.Lang.Double.ValueOf(720),
-                        Java.Lang.Double.ValueOf(500)
+                        true,
+                        null,
+                        null
                       );
 
                     var uris = new List<Android.Net.Uri>
@@ -116,7 +165,7 @@ namespace video_compress
 
                     VideoCompressor.Start(this,
                                       uris,
-                                      Android.OS.Environment.DirectoryMovies,
+                                      $"{Android.OS.Environment.DirectoryMovies}/compressedVideos",
                                       vcl,
                                       configuration);
                     try
@@ -156,11 +205,26 @@ namespace video_compress
         //    else return null;
         //}
 
-        public long GetSize(Android.Net.Uri uri)
+        public string GetSize(Android.Net.Uri uri)
         {
             using (var fd = ContentResolver.OpenFileDescriptor(uri, "r"))
-            return fd.StatSize;
+                //return $"{(fd.StatSize / 1000000).ToString()} Mb";
+                return fd.StatSize.ToString();
         }
-    }
+
+        public string GetFileSize(Long size) {
+            if (size.IntValue() <= 0)
+                return "0";
+
+            var units = new List<string> { "B", "KB", "MB", "GB", "TB" };
+            var digitGroups = ((int)(System.Math.Log10(size.DoubleValue()) / System.Math.Log10(1024.0)));
+
+            return $"{System.Math.Pow(1024.0, (double)digitGroups).ToString("#,##0.#")} {units[digitGroups]}";
+
+            //DecimalFormat("#,##0.#").format(
+            //    size / .Pow(digitGroups.toDouble())
+            //) + " " + units[digitGroups];
+        }
+}
 }
 

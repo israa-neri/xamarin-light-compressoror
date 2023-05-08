@@ -64,6 +64,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MediaUtils.cs" />
     <Compile Include="VideoCompressorListener.cs" />
+    <Compile Include="CustomVideoCompressor.cs" />
+    <Compile Include="IVideoCompressorListener.cs" />
+    <Compile Include="CustomVideoCompressorListener.cs" />
+    <Compile Include="IVideoCompressor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
